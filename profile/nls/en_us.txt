@@ -1,0 +1,19 @@
+# TUYA Control
+ND-controller-NAME = TUYA Controller
+ND-controller-ICON = GenericCtl
+CMD-ctl-DISCOVER-NAME = Re-Discover Devices
+ST-ctl-ST-NAME = NodeServer Online
+ST-ctl-GV0-NAME = Devices discovered
+
+# Ligths
+ND-tuyalight-NAME = TUYA Device
+ND-tuyalight-ICON = Lamp
+
+ST-ST-NAME = Status
+
+#Generic for all Types
+CMD-DON-NAME = On
+CMD-DOF-NAME = Off
+CMD-DFON-NAME = Fast On
+CMD-DFOF-NAME = Fast Off
+CMD-QUERY-NAME = Query
