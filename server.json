@@ -11,7 +11,7 @@
     "credits": [
         {
             "title": "polylifx: TinyTuya is a Python module to interface with Tuya WiFi smart devices.",
-            "author": "Fernando Flechas (ferflechas)",
+            "author": "Fernando Flechas",
             "version": "1.0.1",
             "date": "February 22, 2022",
             "source": "https://github.com/ferflechas/udi-tuya-poly_v2",
