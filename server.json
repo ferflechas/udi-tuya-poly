@@ -6,12 +6,12 @@
     "install": "install.sh",
     "shortPoll": "30",
     "longPoll": "600",
-    "description": "This is a simple integration of TinyTuya to ISY994i only to Power On/Off Tuya WiFi smart bulbs/outlets.",
+    "description": "Simple integration of TinyTuya only to Power On/Off Tuya WiFi smart bulbs/outlets.",
     "notice": "\"TUYA\" is trademarked., see http://www.tuya.com for more information. This Node Server is neither developed by nor endorsed by TUYA.",
     "credits": [
         {
             "title": "polylifx: TinyTuya is a Python module to interface with Tuya WiFi smart devices.",
-            "author": "Fernando Flechas",
+            "author": "ferflechas",
             "version": "1.0.1",
             "date": "February 22, 2022",
             "source": "https://github.com/ferflechas/udi-tuya-poly_v2",
