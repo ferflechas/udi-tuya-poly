@@ -6,7 +6,7 @@
     "install": "install.sh",
     "shortPoll": "30",
     "longPoll": "600",
-    "description": "This is a simple integration of TinyTuya to ISY994i only to Power On/Off Tuya WiFi smart bulbs/outlets. See https://pypi.org/project/tinytuya/ for more information.",
+    "description": "This is a simple integration of TinyTuya to ISY994i only to Power On/Off Tuya WiFi smart bulbs/outlets.",
     "notice": "\"TUYA\" is trademarked., see http://www.tuya.com for more information. This Node Server is neither developed by nor endorsed by TUYA.",
     "credits": [
         {
