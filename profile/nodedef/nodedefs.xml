@@ -24,8 +24,6 @@
             <sends>
                 <cmd id="DON" />
                 <cmd id="DOF" />
-                <cmd id="DFON" />
-                <cmd id="DFOF" />
             </sends>
             <accepts>
                 <cmd id="DON" />
