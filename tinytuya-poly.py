@@ -189,7 +189,7 @@ class Light(polyinterface.Node):
         try:
             self.tuya = self._getTuya()
             if self.tuya is not None:
-                self.tuya.set_status(True)
+                self.tuya.turn_on()
         except Exception as ex:
             LOGGER.error('Connection Error on setting {} device On. {}'.format(self.name, str(ex)))
         else:
@@ -200,7 +200,7 @@ class Light(polyinterface.Node):
         try:
             self.tuya = self._getTuya()
             if self.tuya is not None:
-                self.tuya.set_status(False)
+                self.tuya.turn_off()
         except Exception as ex:
             LOGGER.error('Connection Error on setting {} device Off. {}'.format(self.name, str(ex)))
         else:
