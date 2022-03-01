@@ -3,12 +3,8 @@
     <editor id="bool">
         <range uom="2" subset="0,1" />
     </editor>
-    <!-- TUYA Color Editor -->
-    <editor id="tuyaclr">
-        <range uom="56" min="0" max="65535" prec="0" step="1" />
-    </editor>
     <!-- TUYA Status Editor -->
     <editor id="tuyast">
-        <range uom="51" min="0" max="100" prec="4" />
+        <range uom="78" subset="0,100" />
     </editor>
 </editors>

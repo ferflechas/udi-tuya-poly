@@ -243,7 +243,7 @@ class Light(polyinterface.Node):
 
     id = 'tuyalight'
     drivers = [
-                 {'driver': 'ST', 'value': 0, 'uom': 51}
+                 {'driver': 'ST', 'value': 0, 'uom': 78}
               ]
     commands = {
                  'DON': setOn,
