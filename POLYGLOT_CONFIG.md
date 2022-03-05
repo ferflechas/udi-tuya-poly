@@ -1,5 +1,5 @@
 # UDI TUYA Poly_v2
-This is a simple integration of TinyTuya to ISY994i only to Power On/Off Tuya WiFi smart bulbs/outlets.
+This is a simple integration of TinyTuya with Polyglot v2 to Power Tuya WiFi Smart Bulbs/Outlets and change Mode/Scene on Bulbs
 
 Please install via [Polyglot v2](https://github.com/UniversalDevicesInc/polyglot-v2) Store.
 

@@ -14,11 +14,41 @@
         </cmds>
     </nodeDef>
     <!-- NODE DEF from 5.0 document http://wiki.universal-devices.com/index.php?title=V50_MAIN -->
-    <!-- TUYA Light -->
-    <nodeDef id="tuyalight" nls="tuyac">
+    <!-- TUYA Light Device -->
+    <nodeDef id="tuyabulb" nls="tuyab">
         <editors />
         <sts>
-            <st id="ST" editor="tuyast" />
+            <st id="ST" editor="tuya_state" />
+            <st id="BRT" editor="tuya_bright" />
+            <st id="LUMIN" editor="tuya_temp" />
+            <st id="GV0" editor="tuya_mode" />
+            <st id="GV1" editor="tuya_scene" />
+        </sts>
+        <cmds>
+            <sends>
+                <cmd id="DON" />
+                <cmd id="DOF" />
+            </sends>
+            <accepts>
+                <cmd id="DON" />
+                <cmd id="DOF" />
+                <cmd id="DFON" />
+                <cmd id="DFOF" />
+                <cmd id="QUERY" />
+                <cmd id="SET_MODE">
+                    <p id="" editor="tuya_mode" init="GV0"/>
+                </cmd>
+                <cmd id="SET_SCENE">
+                    <p id="" editor="tuya_scene" init="GV1"/>
+                </cmd>
+            </accepts>
+        </cmds>
+    </nodeDef>
+    <!-- TUYA Outlet -->
+    <nodeDef id="tuyaoutlet" nls="tuyao">
+        <editors />
+        <sts>
+            <st id="ST" editor="tuya_state" />
         </sts>
         <cmds>
             <sends>

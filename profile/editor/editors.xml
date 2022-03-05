@@ -4,7 +4,23 @@
         <range uom="2" subset="0,1" />
     </editor>
     <!-- TUYA Status Editor -->
-    <editor id="tuyast">
+    <editor id="tuya_state">
         <range uom="78" subset="0,100" />
+    </editor>
+    <!-- TUYA Bright Editor -->
+    <editor id="tuya_bright">
+        <range uom="51" min="0" max="100" prec="4" />
+    </editor>
+    <!-- TUYA Color Temp Editor -->
+    <editor id="tuya_temp">
+        <range uom="51" min="0" max="100" prec="4" />
+    </editor>
+    <!-- TUYA Mode Editor -->
+    <editor id="tuya_mode">
+        <range uom="25" subset="1-4" nls="ENUM_MODES"/>
+    </editor>
+    <!-- TUYA Scene Editor -->
+    <editor id="tuya_scene">
+        <range uom="25" subset="0-9" nls="ENUM_SCENES"/>
     </editor>
 </editors>

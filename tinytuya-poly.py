@@ -16,6 +16,29 @@ import math
 
 LOGGER = polyinterface.LOGGER
 
+_MODES = {  'white' : 1,
+            'colour': 2,
+            'scene' : 3,
+            'music' : 4
+         }
+
+_SCENES = { '' : 0,                             # None,
+            '000e0d0000000000000000c80000' : 1, # Night
+            '010e0d0000000000000003e801f4' : 2, # Read
+            '020e0d0000000000000003e803e8' : 3, # Working
+            '030e0d0000000000000001f401f4' : 4, # Leisure
+            '04464602007803e803e800000000464602007803e8000a00000000' : 5, # Soft
+            '05464601000003e803e800000000464601007803e803e80000000046460100f003e803e800000000464601003d03e803e80000000046460100ae03e803e800000000464601011303e803e800000000' : 6, # Colorful
+            '06464601000003e803e800000000464601007803e803e80000000046460100f003e803e800000000' : 7, # Dazzling
+            '07464602000003e803e800000000464602007803e803e80000000046460200f003e803e800000000464602003d03e803e80000000046460200ae03e803e800000000464602011303e803e800000000': 8, #  Gorgeous
+            '0' : 9                             # Other
+         }
+
+_COLORS = { 
+            '00a903e803e8' : 1,
+            '012b03e803e8' : 2
+         }
+
 with open('server.json') as data:
     SERVERDATA = json.load(data)
     data.close()
@@ -118,10 +141,10 @@ class Controller(polyinterface.Controller):
                 self.devices_found += 1
                 if d['type'] == 'bulb':
                     LOGGER.info('Found Bulb: {} ({})'.format(name, id))
-                    self.addNode(Light(self, self.address, id, name, d), update = self.update_nodes)
+                    self.addNode(BulbDevice(self, self.address, id, name, d), update = self.update_nodes)
                 elif d['type'] == 'outlet':
                     LOGGER.info('Found Outlet: {} ({})'.format(name, id))
-                    self.addNode(Light(self, self.address, id, name, d), update = self.update_nodes)
+                    self.addNode(OutletDevice(self, self.address, id, name, d), update = self.update_nodes)
                 else:
                     LOGGER.error('Unknown type: {}'.format(d['type']))
         self.setDriver('GV0', self.devices_found)
@@ -156,9 +179,9 @@ class Controller(polyinterface.Controller):
                 'DISCOVER': discover
                }
 
-class Light(polyinterface.Node):
+class BulbDevice(polyinterface.Node):
     """
-    TUYA Light Parent Class
+    TUYA BulbDevice Parent Class
     """
     def __init__(self, controller, primary, address, name, dev):
         super().__init__(controller, primary, address, name)
@@ -179,7 +202,156 @@ class Light(polyinterface.Node):
 
     def update(self):
         self.tuya = self._getTuya()
-        self.setDriver('ST', self._getStatus())
+        _status = self._getStatus()
+        self.setDriver('ST', _status['st'])
+        self.setDriver('BRT', _status['br'])
+        self.setDriver('LUMIN', _status['tm'])
+        self.setDriver('GV0', _status['md'])
+        self.setDriver('GV1', _status['sc'])
+        self.last_update = time.time()
+
+    def long_update(self):
+        self.last_update = time.time()
+
+    def setOn(self, command):
+        try:
+            self.tuya = self._getTuya()
+            if self.tuya is not None:
+                self.tuya.turn_on()
+        except Exception as ex:
+            LOGGER.error('Setting {} device On. Error: {}'.format(self.name, str(ex)))
+        else:
+            self.last_status['st'] = 100
+            self.setDriver('ST', 100)
+
+    def setOff(self, command):
+        try:
+            self.tuya = self._getTuya()
+            if self.tuya is not None:
+                self.tuya.turn_off()
+        except Exception as ex:
+            LOGGER.error('Setting {} device Off. Error: {}'.format(self.name, str(ex)))
+        else:
+            self.last_status['st'] = 0
+            self.setDriver('ST', 0)
+
+    def setMode(self, command):
+        _mode_idx = int(command.get('value'))
+        _modes = list(_MODES)
+        try:
+            self.tuya = self._getTuya()
+            if self.tuya is not None:
+                _mode = _modes[_mode_idx-1]
+                self.tuya.set_mode(_mode)
+        except Exception as ex:
+            LOGGER.error('Setting {} Mode: {} - {}. Error: {}'.format(self.name, _mode_idx, _mode, str(ex)))
+        else:
+            self.last_status['md'] = _mode_idx
+            self.setDriver('GV0', _mode_idx)
+
+    def setScene(self, command):
+        _scene_idx = int(command.get('value'))
+        _scenes = list(_SCENES)
+        try:
+            self.tuya = self._getTuya()
+            if self.tuya is not None:
+                _scene = _scenes[_scene_idx]
+                if _scene is not ('' or '0'):
+                    self.tuya.set_value(25, _scene)
+        except Exception as ex:
+            LOGGER.error('Setting {} Scene: {} - {}. Error: {}'.format(self.name, _scene_idx, _scene, str(ex)))
+        else:
+            self.last_status['sc'] = _scene_idx
+            self.setDriver('GV1', _scene_idx)
+
+    def _getTuya(self):
+        if self.tuya is not None:
+            return self.tuya
+        _tuya = None
+        try:
+            if self.device['type'] == 'bulb':
+                _tuya = tinytuya.BulbDevice(self.device['id'], self.device['ip'], self.device['key'])
+        except Exception as ex:
+            LOGGER.error('Error on {} device. {}'.format(self.name, str(ex)))
+        if _tuya is not None:
+            _tuya.set_version(self.device['ver'])
+        return _tuya
+
+    def _getStatus(self):
+        _status = {}
+        _status['st'] = 0
+        _status['br'] = 0
+        _status['tm'] = 0
+        _status['md'] = 1
+        _status['sc'] = 0
+        if self.last_status is not None:
+            _status = self.last_status
+        if self.tuya is not None:
+            try:
+                _st = self.tuya.status()
+                if 'dps' in _st:
+                    if self.device['type'] == 'bulb':
+                        _status['st'] = 100 if _st['dps']['20'] else 0
+                        _status['br'] = max(0,float(round(_st['dps']['22']/10, 4)))
+                        _status['tm'] = max(0,float(round(_st['dps']['23']/10, 4)))
+                        if _st['dps']['21'] in _MODES:
+                            _status['md'] = _MODES[_st['dps']['21']]
+                        else:
+                            _status['md'] = 1    
+                        if _st['dps']['25'] in _SCENES:
+                            _status['sc'] = _SCENES[_st['dps']['25']]
+                        else:
+                            _status['sc'] = 9
+            except Exception as ex:
+                LOGGER.error('Error on {} ({}) - {}. DPS: {}. Error {}'.format(self.name, self.device['type'], self.device['id'], _st, str(ex)))
+            #else:
+                # LOGGER.info('Status: {} on {} ({}) - {}. DPS: {}'.format(_status, self.name, self.device['type'], self.device['id'], _st))
+        self.last_status = _status
+        return _status
+
+    id = 'tuyabulb'
+    drivers = [
+                 {'driver': 'ST', 'value': 0, 'uom': 78},
+                 {'driver': 'BRT', 'value': 0, 'uom': 51},
+                 {'driver': 'LUMIN', 'value': 0, 'uom': 51},
+                 {'driver': 'GV0', 'value': 1, 'uom': 25},
+                 {'driver': 'GV1', 'value': 0, 'uom': 25}
+              ]
+    commands = {
+                 'DON': setOn,
+                 'DOF': setOff,
+                 'DFON': setOn,
+                 'DFOF': setOff,
+                 'QUERY': query,
+                 'SET_MODE': setMode,
+                 'SET_SCENE': setScene
+               }
+
+class OutletDevice(polyinterface.Node):
+    """
+    TUYA BulbDevice Parent Class
+    """
+    def __init__(self, controller, primary, address, name, dev):
+        super().__init__(controller, primary, address, name)
+        self.tuya = None
+        self.device = dev
+        self.name = name
+        self.last_status = None
+        self.last_update = time.time()
+
+    def start(self):
+        self.update()
+        self.long_update()
+
+    def query(self, command = None):
+        self.update()
+        self.long_update()
+        self.reportDrivers()
+
+    def update(self):
+        self.tuya = self._getTuya()
+        _status = self._getStatus()
+        self.setDriver('ST', _status['st'])
         self.last_update = time.time()
 
     def long_update(self):
@@ -193,7 +365,7 @@ class Light(polyinterface.Node):
         except Exception as ex:
             LOGGER.error('Connection Error on setting {} device On. {}'.format(self.name, str(ex)))
         else:
-            self.last_status = True
+            self.last_status['st'] = 100
             self.setDriver('ST', 100)
 
     def setOff(self, command):
@@ -204,7 +376,7 @@ class Light(polyinterface.Node):
         except Exception as ex:
             LOGGER.error('Connection Error on setting {} device Off. {}'.format(self.name, str(ex)))
         else:
-            self.last_status = False
+            self.last_status['st'] = 0
             self.setDriver('ST', 0)
 
     def _getTuya(self):
@@ -212,9 +384,7 @@ class Light(polyinterface.Node):
             return self.tuya
         _tuya = None
         try:
-            if self.device['type'] == 'bulb':
-                _tuya = tinytuya.BulbDevice(self.device['id'], self.device['ip'], self.device['key'])
-            elif self.device['type'] == 'outlet':
+            if self.device['type'] == 'outlet':
                 _tuya = tinytuya.OutletDevice(self.device['id'], self.device['ip'], self.device['key'])
         except Exception as ex:
             LOGGER.error('Error on {} device. {}'.format(self.name, str(ex)))
@@ -223,25 +393,24 @@ class Light(polyinterface.Node):
         return _tuya
 
     def _getStatus(self):
-        _status = False
+        _status = {}
+        _status['st'] = 0
         if self.last_status is not None:
             _status = self.last_status
         if self.tuya is not None:
             try:
                 _st = self.tuya.status()
                 if 'dps' in _st:
-                    if self.device['type'] == 'bulb':
-                        _status = _st['dps']['20']
-                    elif self.device['type'] == 'outlet':
-                        _status = _st['dps']['1']
+                    if self.device['type'] == 'outlet':
+                        _status['st'] = 100 if _st['dps']['1'] else 0
             except Exception as ex:
                 LOGGER.error('Error on {} ({}) - {}. DPS: {}. Error {}'.format(self.name, self.device['type'], self.device['id'], _st, str(ex)))
-            else:
-                LOGGER.info('Status: {} on {} ({}) - {}. DPS: {}'.format(_status, self.name, self.device['type'], self.device['id'], _st))
+            #else:
+            #    LOGGER.info('Status: {} on {} ({}) - {}. DPS: {}'.format(_status, self.name, self.device['type'], self.device['id'], _st))
         self.last_status = _status
-        return 100 if _status else 0
+        return _status
 
-    id = 'tuyalight'
+    id = 'tuyaoutlet'
     drivers = [
                  {'driver': 'ST', 'value': 0, 'uom': 78}
               ]

@@ -5,15 +5,43 @@ CMD-ctl-DISCOVER-NAME = Re-Discover Devices
 ST-ctl-ST-NAME = NodeServer Online
 ST-ctl-GV0-NAME = Devices discovered
 
-# Ligths
-ND-tuyalight-NAME = TUYA Device
-ND-tuyalight-ICON = Lamp
+# Bulb
+ND-tuyabulb-NAME = TUYA Bulb Device
+ND-tuyabulb-ICON = Lamp
+
+# Outlet
+ND-tuyaoutlet-NAME = TUYA Outlet Device
+ND-tuyaoutlet-ICON = LampAndSwitch
 
 ST-ST-NAME = Status
+ST-BRT-NAME = Bright
+ST-LUMIN-NAME = Color Temp
+ST-GV0-NAME = Mode
+ST-GV1-NAME = Scene
 
-#Generic for all Types
+# Generic for all Types
 CMD-DON-NAME = On
 CMD-DOF-NAME = Off
 CMD-DFON-NAME = Fast On
 CMD-DFOF-NAME = Fast Off
 CMD-QUERY-NAME = Query
+CMD-SET_MODE-NAME = Mode
+CMD-SET_SCENE-NAME = Scene
+
+# Light Modes
+ENUM_MODES-1 = White
+ENUM_MODES-2 = Colour
+ENUM_MODES-3 = Scene
+ENUM_MODES-4 = Music
+
+# Scene Modes
+ENUM_SCENES-0 = None
+ENUM_SCENES-1 = Night
+ENUM_SCENES-2 = Read
+ENUM_SCENES-3 = Working
+ENUM_SCENES-4 = Leisure
+ENUM_SCENES-5 = Soft
+ENUM_SCENES-6 = Colorful
+ENUM_SCENES-7 = Dazzling
+ENUM_SCENES-8 = Gorgeous
+ENUM_SCENES-9 = Other
